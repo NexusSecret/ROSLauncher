@@ -9,6 +9,8 @@ CONFIG_PATH = Path("launcher_settings.json")
 BUTTON_NORMAL_IMAGE = Path("updatebtn.png")
 BUTTON_HOVER_IMAGE = Path("updateover.png")
 BUTTON_TEXT_COLOR = "#b86517"
+LOGO_IMAGE = Path("ros_logo.png")
+APP_BG_COLOR = "#251611"
 
 
 @dataclass
@@ -48,18 +50,26 @@ class ModLauncherApp:
 
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.root.title("Simple Mod Launcher")
-        self.root.geometry("420x340")
+        self.root.title("Return of Shadow Launcher")
+        self.root.geometry("760x430")
+        self.root.configure(bg=APP_BG_COLOR)
         self.settings = LauncherSettings.load()
         self.button_images = self._load_button_images()
+        self.logo_image = self._load_logo_image()
 
-        title = tk.Label(
-            root,
-            text="Game Mod Launcher",
-            font=("Segoe UI", 14, "bold"),
-            pady=12,
-        )
-        title.pack()
+        if self.logo_image is not None:
+            title = tk.Label(root, image=self.logo_image, bg=APP_BG_COLOR, pady=12)
+            title.pack()
+        else:
+            title = tk.Label(
+                root,
+                text="Return of Shadow Launcher",
+                font=("Segoe UI", 18, "bold"),
+                fg=BUTTON_TEXT_COLOR,
+                bg=APP_BG_COLOR,
+                pady=12,
+            )
+            title.pack()
 
         self.toggle_button = self._create_image_button(
             text="Enable Mod",
@@ -73,10 +83,14 @@ class ModLauncherApp:
         )
         self.launch_button.pack(pady=8)
 
-        tk.Button(root, text="Settings", width=24, command=self.open_settings).pack(pady=8)
+        self.settings_button = self._create_image_button(
+            text="Settings",
+            command=self.open_settings,
+        )
+        self.settings_button.pack(pady=8)
 
         self.status_var = tk.StringVar(value="Ready")
-        status = tk.Label(root, textvariable=self.status_var, fg="#333")
+        status = tk.Label(root, textvariable=self.status_var, fg="#c28d52", bg=APP_BG_COLOR)
         status.pack(pady=14)
         self.refresh_toggle_button()
 
@@ -220,7 +234,16 @@ class ModLauncherApp:
     def _create_image_button(self, text: str, command) -> "ImageTextButton | tk.Button":
         if self.button_images is None:
             # Fallback for environments where image files are not present.
-            return tk.Button(self.root, text=text, width=24, command=command)
+            return tk.Button(
+                self.root,
+                text=text,
+                width=24,
+                command=command,
+                bg="#5a3016",
+                fg=BUTTON_TEXT_COLOR,
+                activebackground="#7a421f",
+                activeforeground=BUTTON_TEXT_COLOR,
+            )
 
         return ImageTextButton(
             self.root,
@@ -230,6 +253,19 @@ class ModLauncherApp:
             command=command,
             text_color=BUTTON_TEXT_COLOR,
         )
+
+    def _load_logo_image(self) -> tk.PhotoImage | None:
+        if not LOGO_IMAGE.exists():
+            return None
+        image = tk.PhotoImage(file=str(LOGO_IMAGE))
+        max_width = 560
+        max_height = 150
+        width_scale = max(1, -(-image.width() // max_width))
+        height_scale = max(1, -(-image.height() // max_height))
+        scale = max(width_scale, height_scale)
+        if scale > 1:
+            image = image.subsample(scale, scale)
+        return image
 
 
 class ImageTextButton(tk.Canvas):
