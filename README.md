@@ -8,6 +8,7 @@ Simple desktop launcher for toggling a game mod and launching the game executabl
 - Launch `lotrbfme.exe` from the selected game folder
 - Settings dialog to configure game folder
 - Resolution dropdown in Settings (saved to config and synced to game options)
+- Shellmap dropdown loaded from `shellmaps.json`
 - Matching custom art for **Enable/Disable**, **Launch Game**, and **Settings** buttons
 - Optional header logo image (`ros_logo.png`)
 - Right-side sample scroll display panel reserved for future hosted content
@@ -36,12 +37,25 @@ If `ros_bg.png` is placed next to `launcher.py`, it is used as the launcher back
 1. Open **Settings**.
 2. Set **Game Folder** to the folder that contains the mod files and `lotrbfme.exe`.
 3. Select your preferred screen resolution from the dropdown.
-4. Click **Save**.
+4. Select your preferred shellmap (optional).
+5. Click **Save**.
 
 Settings are stored in `launcher_settings.json` in the same directory.
 When you save settings, the launcher also updates line 19 in:
 `%APPDATA%/My Battle for Middle-Earth Files/Options.ini`
 with the selected resolution.
+
+Shellmap list entries come from `shellmaps.json` in this format:
+
+```json
+[
+  { "file_name": "mtshell.ros", "display_name": "Minas Tirith" },
+  { "file_name": "hdshell.ros", "display_name": "Helm's Deep" }
+]
+```
+
+When selected, `file_name` is renamed from `.ros` to `_rosz<name>.big` in the game folder.
+When changed/deselected, the previous `_rosz<name>.big` is renamed back to `.ros`.
 
 ## Mod toggle behavior
 

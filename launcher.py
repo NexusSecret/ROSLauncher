@@ -8,6 +8,7 @@ from tkinter import scrolledtext
 from tkinter import filedialog, messagebox
 
 CONFIG_PATH = Path("launcher_settings.json")
+SHELLMAPS_PATH = Path("shellmaps.json")
 BUTTON_NORMAL_IMAGE = Path("updatebtn.png")
 BUTTON_HOVER_IMAGE = Path("updateover.png")
 BUTTON_TEXT_COLOR = "#b86517"
@@ -20,6 +21,7 @@ APP_BG_COLOR = "#251611"
 class LauncherSettings:
     game_directory: str = ""
     resolution: str = "1920x1080"
+    shellmap_file: str = ""
 
     @classmethod
     def load(cls) -> "LauncherSettings":
@@ -65,6 +67,7 @@ class ModLauncherApp:
         self.root.title("Return of Shadow Launcher")
         self.root.geometry("980x520")
         self.settings = LauncherSettings.load()
+        self.shellmaps = self._load_shellmaps()
         self.button_images = self._load_button_images()
         self.logo_image = self._load_logo_image()
         self.bg_image = self._load_background_image()
@@ -264,6 +267,9 @@ class ModLauncherApp:
 
         game_directory_var = tk.StringVar(value=self.settings.game_directory)
         resolution_var = tk.StringVar(value=self.settings.resolution)
+        shellmap_names = ["None"] + [entry["display_name"] for entry in self.shellmaps]
+        selected_shellmap_name = self._display_name_for_file(self.settings.shellmap_file) or "None"
+        shellmap_var = tk.StringVar(value=selected_shellmap_name)
         if resolution_var.get() not in self.RESOLUTIONS:
             resolution_var.set(self.RESOLUTIONS[0])
 
@@ -285,17 +291,26 @@ class ModLauncherApp:
         resolution_dropdown.config(width=20)
         resolution_dropdown.grid(row=1, column=1, padx=8, pady=8, sticky="w")
 
+        tk.Label(window, text="Shellmap", anchor="w").grid(row=2, column=0, padx=8, pady=8, sticky="w")
+        shellmap_dropdown = tk.OptionMenu(window, shellmap_var, *shellmap_names)
+        shellmap_dropdown.config(width=20)
+        shellmap_dropdown.grid(row=2, column=1, padx=8, pady=8, sticky="w")
+
         def save_settings() -> None:
+            previous_shellmap = self.settings.shellmap_file
             self.settings.game_directory = game_directory_var.get().strip()
             self.settings.resolution = resolution_var.get().strip()
+            selected_name = shellmap_var.get().strip()
+            self.settings.shellmap_file = self._file_for_display_name(selected_name) if selected_name != "None" else ""
             self.settings.save()
             self._apply_resolution_to_options()
+            self._apply_shellmap_selection(previous_shellmap, self.settings.shellmap_file)
             self.set_status("Settings saved.")
             self.refresh_toggle_button()
             window.destroy()
 
         tk.Button(window, text="Save", width=12, command=save_settings).grid(
-            row=2,
+            row=3,
             column=2,
             padx=8,
             pady=12,
@@ -372,6 +387,61 @@ class ModLauncherApp:
         width, height = self.settings.resolution.split("x", maxsplit=1)
         lines[18] = f"Resolution = {width} {height}"
         options_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    def _load_shellmaps(self) -> list[dict[str, str]]:
+        if not SHELLMAPS_PATH.exists():
+            return []
+
+        try:
+            data = json.loads(SHELLMAPS_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+
+        if not isinstance(data, list):
+            return []
+
+        clean_entries = []
+        for entry in data:
+            if not isinstance(entry, dict):
+                continue
+            file_name = str(entry.get("file_name", "")).strip()
+            display_name = str(entry.get("display_name", "")).strip()
+            if file_name and display_name:
+                clean_entries.append({"file_name": file_name, "display_name": display_name})
+        return clean_entries
+
+    def _display_name_for_file(self, file_name: str) -> str:
+        for entry in self.shellmaps:
+            if entry["file_name"] == file_name:
+                return entry["display_name"]
+        return ""
+
+    def _file_for_display_name(self, display_name: str) -> str:
+        for entry in self.shellmaps:
+            if entry["display_name"] == display_name:
+                return entry["file_name"]
+        return ""
+
+    def _shellmap_target_big_name(self, file_name: str) -> str:
+        stem = Path(file_name).stem
+        return f"_rosz{stem}.big"
+
+    def _apply_shellmap_selection(self, previous_file: str, selected_file: str) -> None:
+        game_dir = self._get_game_directory()
+        if game_dir is None:
+            return
+
+        if previous_file and previous_file != selected_file:
+            previous_big = game_dir / self._shellmap_target_big_name(previous_file)
+            previous_ros = game_dir / previous_file
+            if previous_big.exists():
+                previous_big.rename(previous_ros)
+
+        if selected_file:
+            selected_ros = game_dir / selected_file
+            selected_big = game_dir / self._shellmap_target_big_name(selected_file)
+            if selected_ros.exists():
+                selected_ros.rename(selected_big)
 
 
 class ImageTextButton(tk.Canvas):
