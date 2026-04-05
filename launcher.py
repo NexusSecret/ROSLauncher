@@ -123,6 +123,13 @@ class ModLauncherApp:
         )
         self.main_canvas.create_window(36, 310, window=self.settings_button, anchor="nw")
 
+        self.update_button = self._create_image_button(
+            parent=self.main_canvas,
+            text="Update",
+            command=self.open_update,
+        )
+        self.main_canvas.create_window(36, 380, window=self.update_button, anchor="nw")
+
         display_panel = tk.Frame(self.main_canvas, bg="#140d09", bd=1, relief="sunken")
         self.main_canvas.create_window(280, 170, window=display_panel, anchor="nw", width=660, height=300)
 
@@ -340,7 +347,7 @@ class ModLauncherApp:
 
         test_mode_checkbox = tk.Checkbutton(
             window,
-            text="Test Mode (rostest.ros → _rostest.big)",
+            text="Test Mode",
             variable=test_mode_var,
             bg=APP_BG_COLOR,
             fg=BUTTON_TEXT_COLOR,
@@ -379,6 +386,24 @@ class ModLauncherApp:
         ).grid(
             row=4,
             column=2,
+            padx=8,
+            pady=12,
+            sticky="e",
+        )
+
+        tk.Button(
+            window,
+            text="Cancel",
+            width=12,
+            command=window.destroy,
+            bg="#5a3016",
+            fg=BUTTON_TEXT_COLOR,
+            activebackground="#7a421f",
+            activeforeground=BUTTON_TEXT_COLOR,
+            relief="flat",
+        ).grid(
+            row=4,
+            column=1,
             padx=8,
             pady=12,
             sticky="e",
@@ -524,6 +549,10 @@ class ModLauncherApp:
         elif previous_enabled and not selected_enabled:
             if target_big.exists():
                 target_big.rename(source_ros)
+
+    def open_update(self) -> None:
+        # Placeholder for future update URL/server integration.
+        self.set_status("Update feature coming soon.")
 
 
 class ImageTextButton(tk.Canvas):

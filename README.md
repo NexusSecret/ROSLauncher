@@ -6,10 +6,11 @@ Simple desktop launcher for toggling a game mod and launching the game executabl
 
 - Toggle mod with one button (Enable/Disable)
 - Launch `lotrbfme.exe` from the selected game folder
+- Update button placeholder for future update-server integration
 - Settings dialog to configure game folder
 - Resolution dropdown in Settings (saved to config and synced to game options)
 - Shellmap dropdown loaded from `shellmaps.json`
-- Test Mode checkbox (`rostest.ros` ↔ `_rostest.big`)
+- Test Mode checkbox
 - Matching custom art for **Enable/Disable**, **Launch Game**, and **Settings** buttons
 - Optional header logo image (`ros_logo.png`)
 - Right-side sample scroll display panel reserved for future hosted content
