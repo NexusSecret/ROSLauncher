@@ -7,7 +7,8 @@ Simple desktop launcher for toggling a game mod and launching the game executabl
 - Toggle mod with one button (Enable/Disable)
 - Launch `lotrbfme.exe` from the selected game folder
 - Settings dialog to configure game folder
-- Optional custom button art: `updatebtn.png` (normal) and `updateover.png` (hover)
+- Matching custom art for **Enable/Disable**, **Launch Game**, and **Settings** buttons
+- Optional header logo image (`ros_logo.png`)
 
 ## Requirements
 
@@ -19,7 +20,9 @@ Simple desktop launcher for toggling a game mod and launching the game executabl
 python launcher.py
 ```
 
-If `updatebtn.png` and `updateover.png` are placed next to `launcher.py`, the launcher uses them for the **Enable/Disable** and **Launch Game** buttons with overlaid text color `#b86517`.
+If `updatebtn.png` and `updateover.png` are placed next to `launcher.py`, the launcher uses them for the **Enable/Disable**, **Launch Game**, and **Settings** buttons with overlaid text color `#b86517`.
+
+If `ros_logo.png` is placed next to `launcher.py`, it is shown as the launcher header. The launcher background color is `#251611`.
 
 ## First-time setup
 
