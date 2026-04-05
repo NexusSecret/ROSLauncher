@@ -34,7 +34,11 @@ If `ros_bg.png` is placed next to `launcher.py`, it is used as the launcher back
 
 > Note: these optional image files are intentionally gitignored so you can keep art assets local without blocking PR updates.
 
-`news_feed.html` is included as a styled template page for future hosted update/news content (for example, serving from S3).
+`news_feed.html` is included as a styled template page for hosted update/news content and now reads entries from `feed.json` (same folder/URL path).
+
+Configured feed URLs in `launcher.py`:
+- Page: `https://roslauncher.s3.ap-southeast-2.amazonaws.com/news/news_feed.html`
+- JSON: `https://roslauncher.s3.ap-southeast-2.amazonaws.com/news/feed.json`
 
 ## First-time setup
 

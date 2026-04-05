@@ -98,36 +98,49 @@
         <p class="subtitle">Replace these sample entries with content from your update pipeline.</p>
       </section>
 
-      <section class="cards" aria-label="News feed entries">
-        <article class="card">
-          <h2>Server Feed Connected</h2>
-          <p class="meta">Status • Sample Entry</p>
-          <p>
-            This page is ready to host your launcher updates. You can replace the static blocks with generated
-            entries from your S3 publish process.
-          </p>
-        </article>
-
-        <article class="card">
-          <h2>Patch Notes Placeholder</h2>
-          <p class="meta">Version 0.0.0 • YYYY-MM-DD</p>
-          <p>
-            Add bullet points or summary text here for each release. Keep titles short so they fit well in the
-            launcher's update panel.
-          </p>
-        </article>
-
-        <article class="card">
-          <h2>Community Notice Placeholder</h2>
-          <p class="meta">Announcement</p>
-          <p>
-            Use this card for events, maintenance windows, or known issues. You can add links if you want the feed
-            to direct players to external pages.
-          </p>
-        </article>
-      </section>
+      <section class="cards" id="news-cards" aria-label="News feed entries"></section>
 
       <p class="footer">Return of Shadow Launcher Feed Template</p>
     </main>
+    <script>
+      async function loadFeed() {
+        const container = document.getElementById(\"news-cards\");
+        container.innerHTML = \"\";
+
+        try {
+          const response = await fetch(\"feed.json\", { cache: \"no-store\" });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          if (!Array.isArray(data) || data.length === 0) throw new Error(\"Empty feed\");
+
+          for (const item of data) {
+            const article = document.createElement(\"article\");
+            article.className = \"card\";
+
+            const title = document.createElement(\"h2\");
+            title.textContent = item.title || \"Untitled\";
+            article.appendChild(title);
+
+            const meta = document.createElement(\"p\");
+            meta.className = \"meta\";
+            meta.textContent = item.meta || \"\";
+            article.appendChild(meta);
+
+            const body = document.createElement(\"p\");
+            body.textContent = item.body || \"\";
+            article.appendChild(body);
+
+            container.appendChild(article);
+          }
+        } catch (error) {
+          const article = document.createElement(\"article\");
+          article.className = \"card\";
+          article.innerHTML = `<h2>Feed Unavailable</h2><p class=\"meta\">Error</p><p>${error}</p>`;
+          container.appendChild(article);
+        }
+      }
+
+      loadFeed();
+    </script>
   </body>
 </html>

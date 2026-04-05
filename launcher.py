@@ -1,6 +1,9 @@
 import json
 import os
 import subprocess
+import urllib.error
+import urllib.request
+import webbrowser
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import tkinter as tk
@@ -15,6 +18,8 @@ BUTTON_TEXT_COLOR = "#b86517"
 LOGO_IMAGE = Path("ros_logo.png")
 BG_IMAGE = Path("ros_bg.png")
 APP_BG_COLOR = "#251611"
+NEWS_FEED_PAGE_URL = "https://roslauncher.s3.ap-southeast-2.amazonaws.com/news/news_feed.html"
+NEWS_FEED_JSON_URL = "https://roslauncher.s3.ap-southeast-2.amazonaws.com/news/feed.json"
 
 
 @dataclass
@@ -157,15 +162,9 @@ class ModLauncherApp:
         self.display_box.pack(fill="both", expand=True, padx=10, pady=(0, 10))
         self.display_box.insert(
             "1.0",
-            "Sample Update Feed\n\n"
-            "Welcome to Return of Shadow Launcher.\n\n"
-            "This panel is reserved for your upcoming web-driven display feature.\n"
-            "Once you provide the hosted URL, this area can be replaced with live content.\n\n"
-            "- Sample item 1: Patch notes preview\n"
-            "- Sample item 2: Community announcement\n"
-            "- Sample item 3: Version status",
+            "Loading news feed...",
         )
-        self.display_box.configure(state="disabled")
+        self._refresh_news_feed()
 
         self.status_text_item = self.main_canvas.create_text(
             36,
@@ -551,8 +550,48 @@ class ModLauncherApp:
                 target_big.rename(source_ros)
 
     def open_update(self) -> None:
-        # Placeholder for future update URL/server integration.
-        self.set_status("Update feature coming soon.")
+        webbrowser.open(NEWS_FEED_PAGE_URL)
+        self.set_status("Opened update feed in browser.")
+
+    def _refresh_news_feed(self) -> None:
+        content = self._fetch_news_from_json()
+        self.display_box.configure(state="normal")
+        self.display_box.delete("1.0", "end")
+        self.display_box.insert("1.0", content)
+        self.display_box.configure(state="disabled")
+
+    def _fetch_news_from_json(self) -> str:
+        try:
+            with urllib.request.urlopen(NEWS_FEED_JSON_URL, timeout=5) as response:
+                payload = response.read().decode("utf-8")
+            data = json.loads(payload)
+            if not isinstance(data, list):
+                raise ValueError("Feed JSON root must be a list")
+
+            lines = ["Live Feed", ""]
+            for entry in data[:10]:
+                if not isinstance(entry, dict):
+                    continue
+                title = str(entry.get("title", "Untitled")).strip()
+                meta = str(entry.get("meta", "")).strip()
+                body = str(entry.get("body", "")).strip()
+                lines.append(title)
+                if meta:
+                    lines.append(meta)
+                if body:
+                    lines.append(body)
+                lines.append("")
+
+            if len(lines) <= 2:
+                raise ValueError("Feed JSON is empty")
+            return "\n".join(lines).strip()
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, ValueError) as exc:
+            return (
+                "Live Feed unavailable.\n\n"
+                f"JSON URL: {NEWS_FEED_JSON_URL}\n"
+                f"Page URL: {NEWS_FEED_PAGE_URL}\n\n"
+                f"Error: {exc}"
+            )
 
 
 class ImageTextButton(tk.Canvas):

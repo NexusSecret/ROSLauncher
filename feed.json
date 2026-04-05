@@ -1,0 +1,17 @@
+[
+  {
+    "title": "Server Feed Connected",
+    "meta": "Status • Sample Entry",
+    "body": "Your S3 hosted feed is now wired up. Replace this with your live update text."
+  },
+  {
+    "title": "Patch Notes Placeholder",
+    "meta": "Version 0.0.0 • YYYY-MM-DD",
+    "body": "Use this card for patch notes and gameplay changes."
+  },
+  {
+    "title": "Community Notice Placeholder",
+    "meta": "Announcement",
+    "body": "Use this section for events, known issues, and maintenance windows."
+  }
+]
