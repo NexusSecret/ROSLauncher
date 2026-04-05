@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -18,6 +19,7 @@ APP_BG_COLOR = "#251611"
 @dataclass
 class LauncherSettings:
     game_directory: str = ""
+    resolution: str = "1920x1080"
 
     @classmethod
     def load(cls) -> "LauncherSettings":
@@ -48,6 +50,14 @@ class ModLauncherApp:
         "_rospatch01",
         "_rospatch02",
         "_rospatch03",
+    ]
+    RESOLUTIONS = [
+        "1280x720",
+        "1366x768",
+        "1600x900",
+        "1920x1080",
+        "2560x1440",
+        "3840x2160",
     ]
 
     def __init__(self, root: tk.Tk) -> None:
@@ -249,10 +259,13 @@ class ModLauncherApp:
     def open_settings(self) -> None:
         window = tk.Toplevel(self.root)
         window.title("Launcher Settings")
-        window.geometry("600x140")
+        window.geometry("600x210")
         window.grab_set()
 
         game_directory_var = tk.StringVar(value=self.settings.game_directory)
+        resolution_var = tk.StringVar(value=self.settings.resolution)
+        if resolution_var.get() not in self.RESOLUTIONS:
+            resolution_var.set(self.RESOLUTIONS[0])
 
         def add_path_row(row: int, label_text: str, var: tk.StringVar, select_file: bool = True) -> None:
             tk.Label(window, text=label_text, anchor="w").grid(row=row, column=0, padx=8, pady=8, sticky="w")
@@ -267,15 +280,22 @@ class ModLauncherApp:
 
         add_path_row(0, "Game Folder", game_directory_var, select_file=False)
 
+        tk.Label(window, text="Resolution", anchor="w").grid(row=1, column=0, padx=8, pady=8, sticky="w")
+        resolution_dropdown = tk.OptionMenu(window, resolution_var, *self.RESOLUTIONS)
+        resolution_dropdown.config(width=20)
+        resolution_dropdown.grid(row=1, column=1, padx=8, pady=8, sticky="w")
+
         def save_settings() -> None:
             self.settings.game_directory = game_directory_var.get().strip()
+            self.settings.resolution = resolution_var.get().strip()
             self.settings.save()
+            self._apply_resolution_to_options()
             self.set_status("Settings saved.")
             self.refresh_toggle_button()
             window.destroy()
 
         tk.Button(window, text="Save", width=12, command=save_settings).grid(
-            row=1,
+            row=2,
             column=2,
             padx=8,
             pady=12,
@@ -333,6 +353,25 @@ class ModLauncherApp:
         if not BG_IMAGE.exists():
             return None
         return tk.PhotoImage(file=str(BG_IMAGE))
+
+    def _apply_resolution_to_options(self) -> None:
+        appdata = os.getenv("APPDATA")
+        if appdata:
+            options_path = Path(appdata) / "My Battle for Middle-Earth Files" / "Options.ini"
+        else:
+            options_path = Path.home() / "AppData" / "Roaming" / "My Battle for Middle-Earth Files" / "Options.ini"
+
+        options_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = []
+        if options_path.exists():
+            lines = options_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+
+        while len(lines) < 19:
+            lines.append("")
+
+        width, height = self.settings.resolution.split("x", maxsplit=1)
+        lines[18] = f"Resolution = {width} {height}"
+        options_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 class ImageTextButton(tk.Canvas):

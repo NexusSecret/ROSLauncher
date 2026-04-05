@@ -7,6 +7,7 @@ Simple desktop launcher for toggling a game mod and launching the game executabl
 - Toggle mod with one button (Enable/Disable)
 - Launch `lotrbfme.exe` from the selected game folder
 - Settings dialog to configure game folder
+- Resolution dropdown in Settings (saved to config and synced to game options)
 - Matching custom art for **Enable/Disable**, **Launch Game**, and **Settings** buttons
 - Optional header logo image (`ros_logo.png`)
 - Right-side sample scroll display panel reserved for future hosted content
@@ -34,9 +35,13 @@ If `ros_bg.png` is placed next to `launcher.py`, it is used as the launcher back
 
 1. Open **Settings**.
 2. Set **Game Folder** to the folder that contains the mod files and `lotrbfme.exe`.
-3. Click **Save**.
+3. Select your preferred screen resolution from the dropdown.
+4. Click **Save**.
 
 Settings are stored in `launcher_settings.json` in the same directory.
+When you save settings, the launcher also updates line 19 in:
+`%APPDATA%/My Battle for Middle-Earth Files/Options.ini`
+with the selected resolution.
 
 ## Mod toggle behavior
 
