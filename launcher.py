@@ -10,7 +10,6 @@ CONFIG_PATH = Path("launcher_settings.json")
 
 @dataclass
 class LauncherSettings:
-    game_exe_path: str = ""
     game_directory: str = ""
 
     @classmethod
@@ -116,7 +115,6 @@ class ModLauncherApp:
 
         self.refresh_toggle_button()
         self.set_status(f"Mod enabled ({renamed} file(s) renamed).")
-        messagebox.showinfo("Mod Enabled", f"Completed. Renamed {renamed} file(s).")
 
     def disable_mod(self) -> None:
         game_dir = self._get_game_directory()
@@ -135,7 +133,6 @@ class ModLauncherApp:
 
         self.refresh_toggle_button()
         self.set_status(f"Mod disabled ({renamed} file(s) renamed).")
-        messagebox.showinfo("Mod Disabled", f"Completed. Renamed {renamed} file(s).")
 
     def toggle_mod(self) -> None:
         if self.mod_is_enabled():
@@ -144,12 +141,11 @@ class ModLauncherApp:
             self.enable_mod()
 
     def launch_game(self) -> None:
-        exe_path = Path(self.settings.game_exe_path)
-
-        if not self.settings.game_exe_path:
-            messagebox.showerror("Missing settings", "Please configure game executable path in Settings.")
+        game_dir = self._get_game_directory()
+        if game_dir is None:
             return
 
+        exe_path = game_dir / "lotrbfme.exe"
         if not exe_path.exists():
             messagebox.showerror("File not found", f"Executable does not exist:\n{exe_path}")
             return
@@ -160,10 +156,9 @@ class ModLauncherApp:
     def open_settings(self) -> None:
         window = tk.Toplevel(self.root)
         window.title("Launcher Settings")
-        window.geometry("600x180")
+        window.geometry("600x140")
         window.grab_set()
 
-        game_exe_var = tk.StringVar(value=self.settings.game_exe_path)
         game_directory_var = tk.StringVar(value=self.settings.game_directory)
 
         def add_path_row(row: int, label_text: str, var: tk.StringVar, select_file: bool = True) -> None:
@@ -177,11 +172,9 @@ class ModLauncherApp:
 
             tk.Button(window, text="Browse", command=browse).grid(row=row, column=2, padx=8, pady=8)
 
-        add_path_row(0, "Game EXE", game_exe_var)
-        add_path_row(1, "Game Folder", game_directory_var, select_file=False)
+        add_path_row(0, "Game Folder", game_directory_var, select_file=False)
 
         def save_settings() -> None:
-            self.settings.game_exe_path = game_exe_var.get().strip()
             self.settings.game_directory = game_directory_var.get().strip()
             self.settings.save()
             self.set_status("Settings saved.")
@@ -189,7 +182,7 @@ class ModLauncherApp:
             window.destroy()
 
         tk.Button(window, text="Save", width=12, command=save_settings).grid(
-            row=2,
+            row=1,
             column=2,
             padx=8,
             pady=12,

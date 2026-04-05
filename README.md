@@ -5,8 +5,8 @@ Simple desktop launcher for toggling a game mod and launching the game executabl
 ## Features
 
 - Toggle mod with one button (Enable/Disable)
-- Launch game executable
-- Settings dialog to configure game executable and game folder
+- Launch `lotrbfme.exe` from the selected game folder
+- Settings dialog to configure game folder
 
 ## Requirements
 
@@ -21,9 +21,8 @@ python launcher.py
 ## First-time setup
 
 1. Open **Settings**.
-2. Set **Game EXE** to your game executable path.
-3. Set **Game Folder** to the folder that contains the mod files.
-4. Click **Save**.
+2. Set **Game Folder** to the folder that contains the mod files and `lotrbfme.exe`.
+3. Click **Save**.
 
 Settings are stored in `launcher_settings.json` in the same directory.
 
