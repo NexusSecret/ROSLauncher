@@ -22,6 +22,7 @@ class LauncherSettings:
     game_directory: str = ""
     resolution: str = "1920x1080"
     shellmap_file: str = ""
+    test_mode: bool = False
 
     @classmethod
     def load(cls) -> "LauncherSettings":
@@ -262,7 +263,8 @@ class ModLauncherApp:
     def open_settings(self) -> None:
         window = tk.Toplevel(self.root)
         window.title("Launcher Settings")
-        window.geometry("600x210")
+        window.geometry("600x270")
+        window.configure(bg=APP_BG_COLOR)
         window.grab_set()
 
         game_directory_var = tk.StringVar(value=self.settings.game_directory)
@@ -270,47 +272,112 @@ class ModLauncherApp:
         shellmap_names = ["None"] + [entry["display_name"] for entry in self.shellmaps]
         selected_shellmap_name = self._display_name_for_file(self.settings.shellmap_file) or "None"
         shellmap_var = tk.StringVar(value=selected_shellmap_name)
+        test_mode_var = tk.BooleanVar(value=self.settings.test_mode)
         if resolution_var.get() not in self.RESOLUTIONS:
             resolution_var.set(self.RESOLUTIONS[0])
 
         def add_path_row(row: int, label_text: str, var: tk.StringVar, select_file: bool = True) -> None:
-            tk.Label(window, text=label_text, anchor="w").grid(row=row, column=0, padx=8, pady=8, sticky="w")
-            tk.Entry(window, textvariable=var, width=60).grid(row=row, column=1, padx=8, pady=8, sticky="we")
+            tk.Label(window, text=label_text, anchor="w", bg=APP_BG_COLOR, fg=BUTTON_TEXT_COLOR).grid(
+                row=row, column=0, padx=8, pady=8, sticky="w"
+            )
+            tk.Entry(
+                window,
+                textvariable=var,
+                width=60,
+                bg="#1a100c",
+                fg="#e6d6b9",
+                insertbackground="#e6d6b9",
+                relief="flat",
+            ).grid(row=row, column=1, padx=8, pady=8, sticky="we")
 
             def browse() -> None:
                 selected = filedialog.askopenfilename() if select_file else filedialog.askdirectory()
                 if selected:
                     var.set(selected)
 
-            tk.Button(window, text="Browse", command=browse).grid(row=row, column=2, padx=8, pady=8)
+            tk.Button(
+                window,
+                text="Browse",
+                command=browse,
+                bg="#5a3016",
+                fg=BUTTON_TEXT_COLOR,
+                activebackground="#7a421f",
+                activeforeground=BUTTON_TEXT_COLOR,
+                relief="flat",
+            ).grid(row=row, column=2, padx=8, pady=8)
 
         add_path_row(0, "Game Folder", game_directory_var, select_file=False)
 
-        tk.Label(window, text="Resolution", anchor="w").grid(row=1, column=0, padx=8, pady=8, sticky="w")
+        tk.Label(window, text="Resolution", anchor="w", bg=APP_BG_COLOR, fg=BUTTON_TEXT_COLOR).grid(
+            row=1, column=0, padx=8, pady=8, sticky="w"
+        )
         resolution_dropdown = tk.OptionMenu(window, resolution_var, *self.RESOLUTIONS)
-        resolution_dropdown.config(width=20)
+        resolution_dropdown.config(
+            width=20,
+            bg="#5a3016",
+            fg=BUTTON_TEXT_COLOR,
+            activebackground="#7a421f",
+            activeforeground=BUTTON_TEXT_COLOR,
+            highlightthickness=0,
+        )
+        resolution_dropdown["menu"].config(bg="#5a3016", fg=BUTTON_TEXT_COLOR)
         resolution_dropdown.grid(row=1, column=1, padx=8, pady=8, sticky="w")
 
-        tk.Label(window, text="Shellmap", anchor="w").grid(row=2, column=0, padx=8, pady=8, sticky="w")
+        tk.Label(window, text="Shellmap", anchor="w", bg=APP_BG_COLOR, fg=BUTTON_TEXT_COLOR).grid(
+            row=2, column=0, padx=8, pady=8, sticky="w"
+        )
         shellmap_dropdown = tk.OptionMenu(window, shellmap_var, *shellmap_names)
-        shellmap_dropdown.config(width=20)
+        shellmap_dropdown.config(
+            width=20,
+            bg="#5a3016",
+            fg=BUTTON_TEXT_COLOR,
+            activebackground="#7a421f",
+            activeforeground=BUTTON_TEXT_COLOR,
+            highlightthickness=0,
+        )
+        shellmap_dropdown["menu"].config(bg="#5a3016", fg=BUTTON_TEXT_COLOR)
         shellmap_dropdown.grid(row=2, column=1, padx=8, pady=8, sticky="w")
+
+        test_mode_checkbox = tk.Checkbutton(
+            window,
+            text="Test Mode (rostest.ros → _rostest.big)",
+            variable=test_mode_var,
+            bg=APP_BG_COLOR,
+            fg=BUTTON_TEXT_COLOR,
+            selectcolor="#1a100c",
+            activebackground=APP_BG_COLOR,
+            activeforeground=BUTTON_TEXT_COLOR,
+        )
+        test_mode_checkbox.grid(row=3, column=0, columnspan=2, padx=8, pady=8, sticky="w")
 
         def save_settings() -> None:
             previous_shellmap = self.settings.shellmap_file
+            previous_test_mode = self.settings.test_mode
             self.settings.game_directory = game_directory_var.get().strip()
             self.settings.resolution = resolution_var.get().strip()
             selected_name = shellmap_var.get().strip()
             self.settings.shellmap_file = self._file_for_display_name(selected_name) if selected_name != "None" else ""
+            self.settings.test_mode = test_mode_var.get()
             self.settings.save()
             self._apply_resolution_to_options()
             self._apply_shellmap_selection(previous_shellmap, self.settings.shellmap_file)
+            self._apply_test_mode(previous_test_mode, self.settings.test_mode)
             self.set_status("Settings saved.")
             self.refresh_toggle_button()
             window.destroy()
 
-        tk.Button(window, text="Save", width=12, command=save_settings).grid(
-            row=3,
+        tk.Button(
+            window,
+            text="Save",
+            width=12,
+            command=save_settings,
+            bg="#5a3016",
+            fg=BUTTON_TEXT_COLOR,
+            activebackground="#7a421f",
+            activeforeground=BUTTON_TEXT_COLOR,
+            relief="flat",
+        ).grid(
+            row=4,
             column=2,
             padx=8,
             pady=12,
@@ -442,6 +509,21 @@ class ModLauncherApp:
             selected_big = game_dir / self._shellmap_target_big_name(selected_file)
             if selected_ros.exists():
                 selected_ros.rename(selected_big)
+
+    def _apply_test_mode(self, previous_enabled: bool, selected_enabled: bool) -> None:
+        game_dir = self._get_game_directory()
+        if game_dir is None:
+            return
+
+        source_ros = game_dir / "rostest.ros"
+        target_big = game_dir / "_rostest.big"
+
+        if selected_enabled and not previous_enabled:
+            if source_ros.exists():
+                source_ros.rename(target_big)
+        elif previous_enabled and not selected_enabled:
+            if target_big.exists():
+                target_big.rename(source_ros)
 
 
 class ImageTextButton(tk.Canvas):

@@ -9,6 +9,7 @@ Simple desktop launcher for toggling a game mod and launching the game executabl
 - Settings dialog to configure game folder
 - Resolution dropdown in Settings (saved to config and synced to game options)
 - Shellmap dropdown loaded from `shellmaps.json`
+- Test Mode checkbox (`rostest.ros` ↔ `_rostest.big`)
 - Matching custom art for **Enable/Disable**, **Launch Game**, and **Settings** buttons
 - Optional header logo image (`ros_logo.png`)
 - Right-side sample scroll display panel reserved for future hosted content
@@ -38,7 +39,8 @@ If `ros_bg.png` is placed next to `launcher.py`, it is used as the launcher back
 2. Set **Game Folder** to the folder that contains the mod files and `lotrbfme.exe`.
 3. Select your preferred screen resolution from the dropdown.
 4. Select your preferred shellmap (optional).
-5. Click **Save**.
+5. (Optional) Enable **Test Mode**.
+6. Click **Save**.
 
 Settings are stored in `launcher_settings.json` in the same directory.
 When you save settings, the launcher also updates line 19 in:
@@ -56,6 +58,9 @@ Shellmap list entries come from `shellmaps.json` in this format:
 
 When selected, `file_name` is renamed from `.ros` to `_rosz<name>.big` in the game folder.
 When changed/deselected, the previous `_rosz<name>.big` is renamed back to `.ros`.
+
+When **Test Mode** is enabled, `rostest.ros` is renamed to `_rostest.big`.
+When disabled, `_rostest.big` is renamed back to `rostest.ros`.
 
 ## Mod toggle behavior
 
