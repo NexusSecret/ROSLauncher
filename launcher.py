@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 import urllib.error
 import urllib.request
@@ -558,7 +559,25 @@ class ModLauncherApp:
         self.display_box.configure(state="normal")
         self.display_box.delete("1.0", "end")
         self.display_box.insert("1.0", content)
+        self._add_clickable_links()
         self.display_box.configure(state="disabled")
+
+    def _add_clickable_links(self) -> None:
+        text = self.display_box.get("1.0", "end")
+        for index, match in enumerate(re.finditer(r"https?://\S+", text)):
+            start = f"1.0+{match.start()}c"
+            end = f"1.0+{match.end()}c"
+            url = match.group(0).rstrip(").,")
+            tag_name = f"link_{index}"
+            self.display_box.tag_add(tag_name, start, end)
+            self.display_box.tag_configure(tag_name, foreground="#8fc7ff", underline=True)
+            self.display_box.tag_bind(tag_name, "<Enter>", lambda _e: self.display_box.config(cursor="hand2"))
+            self.display_box.tag_bind(tag_name, "<Leave>", lambda _e: self.display_box.config(cursor="xterm"))
+            self.display_box.tag_bind(
+                tag_name,
+                "<Button-1>",
+                lambda _e, link=url: webbrowser.open(link),
+            )
 
     def _fetch_news_from_json(self) -> str:
         try:

@@ -74,6 +74,8 @@ News feed entries in `feed.json` support:
 - `image_alt` (optional alt text for image)
 - `youtube_url` (optional YouTube link; rendered as embed in `news_feed.html`)
 
+Launcher note: the in-app feed panel is text-based, so image/video media are shown as clickable URLs in the launcher, while full inline media rendering is available in `news_feed.html`.
+
 When **Test Mode** is enabled, `rostest.ros` is renamed to `_rostest.big`.
 When disabled, `_rostest.big` is renamed back to `rostest.ros`.
 
