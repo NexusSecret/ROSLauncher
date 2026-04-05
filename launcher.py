@@ -6,6 +6,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 
 CONFIG_PATH = Path("launcher_settings.json")
+BUTTON_NORMAL_IMAGE = Path("updatebtn.png")
+BUTTON_HOVER_IMAGE = Path("updateover.png")
+BUTTON_TEXT_COLOR = "#b86517"
 
 
 @dataclass
@@ -46,8 +49,9 @@ class ModLauncherApp:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
         self.root.title("Simple Mod Launcher")
-        self.root.geometry("360x240")
+        self.root.geometry("420x340")
         self.settings = LauncherSettings.load()
+        self.button_images = self._load_button_images()
 
         title = tk.Label(
             root,
@@ -57,14 +61,23 @@ class ModLauncherApp:
         )
         title.pack()
 
-        self.toggle_button = tk.Button(root, width=24, command=self.toggle_mod)
-        self.toggle_button.pack(pady=6)
-        tk.Button(root, text="Launch Game", width=24, command=self.launch_game).pack(pady=6)
-        tk.Button(root, text="Settings", width=24, command=self.open_settings).pack(pady=6)
+        self.toggle_button = self._create_image_button(
+            text="Enable Mod",
+            command=self.toggle_mod,
+        )
+        self.toggle_button.pack(pady=8)
+
+        self.launch_button = self._create_image_button(
+            text="Launch Game",
+            command=self.launch_game,
+        )
+        self.launch_button.pack(pady=8)
+
+        tk.Button(root, text="Settings", width=24, command=self.open_settings).pack(pady=8)
 
         self.status_var = tk.StringVar(value="Ready")
         status = tk.Label(root, textvariable=self.status_var, fg="#333")
-        status.pack(pady=10)
+        status.pack(pady=14)
         self.refresh_toggle_button()
 
     def set_status(self, text: str) -> None:
@@ -83,7 +96,11 @@ class ModLauncherApp:
         return game_dir
 
     def refresh_toggle_button(self) -> None:
-        self.toggle_button.configure(text="Disable Mod" if self.mod_is_enabled() else "Enable Mod")
+        button_text = "Disable Mod" if self.mod_is_enabled() else "Enable Mod"
+        if isinstance(self.toggle_button, ImageTextButton):
+            self.toggle_button.set_text(button_text)
+        else:
+            self.toggle_button.configure(text=button_text)
 
     def mod_is_enabled(self) -> bool:
         game_dir = Path(self.settings.game_directory) if self.settings.game_directory else None
@@ -190,6 +207,78 @@ class ModLauncherApp:
         )
 
         window.columnconfigure(1, weight=1)
+
+    def _load_button_images(self) -> dict[str, tk.PhotoImage] | None:
+        if not BUTTON_NORMAL_IMAGE.exists() or not BUTTON_HOVER_IMAGE.exists():
+            return None
+
+        return {
+            "normal": tk.PhotoImage(file=str(BUTTON_NORMAL_IMAGE)),
+            "hover": tk.PhotoImage(file=str(BUTTON_HOVER_IMAGE)),
+        }
+
+    def _create_image_button(self, text: str, command) -> "ImageTextButton | tk.Button":
+        if self.button_images is None:
+            # Fallback for environments where image files are not present.
+            return tk.Button(self.root, text=text, width=24, command=command)
+
+        return ImageTextButton(
+            self.root,
+            text=text,
+            normal_image=self.button_images["normal"],
+            hover_image=self.button_images["hover"],
+            command=command,
+            text_color=BUTTON_TEXT_COLOR,
+        )
+
+
+class ImageTextButton(tk.Canvas):
+    def __init__(
+        self,
+        master,
+        text: str,
+        normal_image: tk.PhotoImage,
+        hover_image: tk.PhotoImage,
+        command,
+        text_color: str,
+    ) -> None:
+        self.normal_image = normal_image
+        self.hover_image = hover_image
+        self.command = command
+
+        super().__init__(
+            master,
+            width=self.normal_image.width(),
+            height=self.normal_image.height(),
+            highlightthickness=0,
+            bd=0,
+            bg=master.cget("bg"),
+        )
+
+        self.image_item = self.create_image(0, 0, image=self.normal_image, anchor="nw")
+        self.text_item = self.create_text(
+            self.normal_image.width() // 2,
+            self.normal_image.height() // 2,
+            text=text,
+            fill=text_color,
+            font=("Segoe UI", 11, "bold"),
+        )
+
+        self.bind("<Enter>", self._on_enter)
+        self.bind("<Leave>", self._on_leave)
+        self.bind("<Button-1>", self._on_click)
+
+    def set_text(self, text: str) -> None:
+        self.itemconfigure(self.text_item, text=text)
+
+    def _on_enter(self, _event) -> None:
+        self.itemconfigure(self.image_item, image=self.hover_image)
+
+    def _on_leave(self, _event) -> None:
+        self.itemconfigure(self.image_item, image=self.normal_image)
+
+    def _on_click(self, _event) -> None:
+        self.command()
 
 
 def main() -> None:
