@@ -575,11 +575,17 @@ class ModLauncherApp:
                 title = str(entry.get("title", "Untitled")).strip()
                 meta = str(entry.get("meta", "")).strip()
                 body = str(entry.get("body", "")).strip()
+                image_url = str(entry.get("image_url", "")).strip()
+                youtube_url = str(entry.get("youtube_url", "")).strip()
                 lines.append(title)
                 if meta:
                     lines.append(meta)
                 if body:
                     lines.append(body)
+                if image_url:
+                    lines.append(f"Image: {image_url}")
+                if youtube_url:
+                    lines.append(f"YouTube: {youtube_url}")
                 lines.append("")
 
             if len(lines) <= 2:

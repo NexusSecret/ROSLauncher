@@ -66,6 +66,14 @@ Shellmap list entries come from `shellmaps.json` in this format:
 When selected, `file_name` is renamed from `.ros` to `_rosz<name>.big` in the game folder.
 When changed/deselected, the previous `_rosz<name>.big` is renamed back to `.ros`.
 
+News feed entries in `feed.json` support:
+- `title` (string)
+- `meta` (string)
+- `body` (string)
+- `image_url` (optional image URL)
+- `image_alt` (optional alt text for image)
+- `youtube_url` (optional YouTube link; rendered as embed in `news_feed.html`)
+
 When **Test Mode** is enabled, `rostest.ros` is renamed to `_rostest.big`.
 When disabled, `_rostest.big` is renamed back to `rostest.ros`.
 

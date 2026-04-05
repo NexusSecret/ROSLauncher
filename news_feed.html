@@ -83,6 +83,26 @@
         line-height: 1.45;
       }
 
+      .media {
+        margin-top: 10px;
+        border: 1px solid rgba(184, 101, 23, 0.25);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--panel-mid);
+      }
+
+      .media img {
+        width: 100%;
+        display: block;
+      }
+
+      .media iframe {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: 0;
+        display: block;
+      }
+
       .footer {
         margin-top: 14px;
         text-align: right;
@@ -130,6 +150,33 @@
             body.textContent = item.body || \"\";
             article.appendChild(body);
 
+            if (item.image_url) {
+              const media = document.createElement(\"div\");
+              media.className = \"media\";
+              const img = document.createElement(\"img\");
+              img.src = item.image_url;
+              img.alt = item.image_alt || item.title || \"Feed image\";
+              img.loading = \"lazy\";
+              media.appendChild(img);
+              article.appendChild(media);
+            }
+
+            if (item.youtube_url) {
+              const embedUrl = toYouTubeEmbedUrl(item.youtube_url);
+              if (embedUrl) {
+                const media = document.createElement(\"div\");
+                media.className = \"media\";
+                const iframe = document.createElement(\"iframe\");
+                iframe.src = embedUrl;
+                iframe.title = item.title || \"YouTube video\";
+                iframe.allow =
+                  \"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\";
+                iframe.allowFullscreen = true;
+                media.appendChild(iframe);
+                article.appendChild(media);
+              }
+            }
+
             container.appendChild(article);
           }
         } catch (error) {
@@ -138,6 +185,23 @@
           article.innerHTML = `<h2>Feed Unavailable</h2><p class=\"meta\">Error</p><p>${error}</p>`;
           container.appendChild(article);
         }
+      }
+
+      function toYouTubeEmbedUrl(url) {
+        try {
+          const parsed = new URL(url);
+          if (parsed.hostname.includes(\"youtu.be\")) {
+            const id = parsed.pathname.replace(\"/\", \"\");
+            return id ? `https://www.youtube.com/embed/${id}` : \"\";
+          }
+          if (parsed.hostname.includes(\"youtube.com\")) {
+            const id = parsed.searchParams.get(\"v\");
+            return id ? `https://www.youtube.com/embed/${id}` : \"\";
+          }
+        } catch (_) {
+          return \"\";
+        }
+        return \"\";
       }
 
       loadFeed();

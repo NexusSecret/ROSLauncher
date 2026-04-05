@@ -2,12 +2,15 @@
   {
     "title": "Server Feed Connected",
     "meta": "Status • Sample Entry",
-    "body": "Your S3 hosted feed is now wired up. Replace this with your live update text."
+    "body": "Your S3 hosted feed is now wired up. Replace this with your live update text.",
+    "image_url": "https://roslauncher.s3.ap-southeast-2.amazonaws.com/news/images/server-feed.jpg",
+    "image_alt": "Return of Shadow server feed artwork"
   },
   {
     "title": "Patch Notes Placeholder",
     "meta": "Version 0.0.0 • YYYY-MM-DD",
-    "body": "Use this card for patch notes and gameplay changes."
+    "body": "Use this card for patch notes and gameplay changes.",
+    "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
   },
   {
     "title": "Community Notice Placeholder",
