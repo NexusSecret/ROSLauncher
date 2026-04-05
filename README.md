@@ -34,6 +34,8 @@ If `ros_bg.png` is placed next to `launcher.py`, it is used as the launcher back
 
 > Note: these optional image files are intentionally gitignored so you can keep art assets local without blocking PR updates.
 
+`news_feed.html` is included as a styled template page for future hosted update/news content (for example, serving from S3).
+
 ## First-time setup
 
 1. Open **Settings**.

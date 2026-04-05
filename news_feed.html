@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Return of Shadow - News Feed</title>
+    <style>
+      :root {
+        --bg-dark: #251611;
+        --panel-dark: #140d09;
+        --panel-mid: #1a100c;
+        --gold: #b86517;
+        --gold-soft: #c28d52;
+        --text: #e6d6b9;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #3a2418 0%, var(--bg-dark) 45%, #100907 100%);
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .header {
+        border: 1px solid rgba(184, 101, 23, 0.4);
+        background: linear-gradient(to bottom, rgba(26, 16, 12, 0.96), rgba(20, 13, 9, 0.96));
+        border-radius: 10px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.4);
+      }
+
+      .title {
+        margin: 0;
+        color: var(--gold);
+        font-size: 1.8rem;
+        letter-spacing: 0.4px;
+      }
+
+      .subtitle {
+        margin: 6px 0 0;
+        color: var(--gold-soft);
+        font-size: 0.95rem;
+      }
+
+      .cards {
+        display: grid;
+        gap: 12px;
+      }
+
+      .card {
+        border: 1px solid rgba(184, 101, 23, 0.34);
+        background: linear-gradient(to bottom, rgba(26, 16, 12, 0.95), rgba(20, 13, 9, 0.95));
+        border-radius: 10px;
+        padding: 14px 16px;
+      }
+
+      .card h2 {
+        margin: 0 0 6px;
+        color: var(--gold);
+        font-size: 1.05rem;
+      }
+
+      .meta {
+        margin: 0 0 10px;
+        color: var(--gold-soft);
+        font-size: 0.85rem;
+      }
+
+      .card p {
+        margin: 0;
+        line-height: 1.45;
+      }
+
+      .footer {
+        margin-top: 14px;
+        text-align: right;
+        color: var(--gold-soft);
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="header">
+        <h1 class="title">Return of Shadow - News & Updates</h1>
+        <p class="subtitle">Replace these sample entries with content from your update pipeline.</p>
+      </section>
+
+      <section class="cards" aria-label="News feed entries">
+        <article class="card">
+          <h2>Server Feed Connected</h2>
+          <p class="meta">Status • Sample Entry</p>
+          <p>
+            This page is ready to host your launcher updates. You can replace the static blocks with generated
+            entries from your S3 publish process.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>Patch Notes Placeholder</h2>
+          <p class="meta">Version 0.0.0 • YYYY-MM-DD</p>
+          <p>
+            Add bullet points or summary text here for each release. Keep titles short so they fit well in the
+            launcher's update panel.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>Community Notice Placeholder</h2>
+          <p class="meta">Announcement</p>
+          <p>
+            Use this card for events, maintenance windows, or known issues. You can add links if you want the feed
+            to direct players to external pages.
+          </p>
+        </article>
+      </section>
+
+      <p class="footer">Return of Shadow Launcher Feed Template</p>
+    </main>
+  </body>
+</html>
