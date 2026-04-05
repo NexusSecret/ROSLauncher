@@ -54,65 +54,68 @@ class ModLauncherApp:
         self.root = root
         self.root.title("Return of Shadow Launcher")
         self.root.geometry("980x520")
-        self.root.configure(bg=APP_BG_COLOR)
         self.settings = LauncherSettings.load()
         self.button_images = self._load_button_images()
         self.logo_image = self._load_logo_image()
         self.bg_image = self._load_background_image()
+        self.root.configure(bg=APP_BG_COLOR)
+
+        width = self.bg_image.width() if self.bg_image is not None else 980
+        height = self.bg_image.height() if self.bg_image is not None else 520
+        self.root.geometry(f"{width}x{height}")
+
+        self.main_canvas = tk.Canvas(
+            root,
+            width=width,
+            height=height,
+            highlightthickness=0,
+            bd=0,
+            bg=APP_BG_COLOR,
+        )
+        self.main_canvas.pack(fill="both", expand=True)
 
         if self.bg_image is not None:
-            self.root.geometry(f"{self.bg_image.width()}x{self.bg_image.height()}")
-            self.bg_label = tk.Label(root, image=self.bg_image, bd=0)
-            self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+            self.main_canvas.create_image(0, 0, image=self.bg_image, anchor="nw")
 
         if self.logo_image is not None:
-            title = tk.Label(root, image=self.logo_image, bg=APP_BG_COLOR, pady=12)
-            title.pack()
+            self.main_canvas.create_image(width // 2, 18, image=self.logo_image, anchor="n")
         else:
-            title = tk.Label(
-                root,
+            self.main_canvas.create_text(
+                width // 2,
+                40,
                 text="Return of Shadow Launcher",
                 font=("Segoe UI", 18, "bold"),
-                fg=BUTTON_TEXT_COLOR,
-                bg=APP_BG_COLOR,
-                pady=12,
+                fill=BUTTON_TEXT_COLOR,
             )
-            title.pack()
-
-        content = tk.Frame(root, bg=APP_BG_COLOR)
-        content.pack(fill="both", expand=True, padx=18, pady=(6, 14))
-
-        button_panel = tk.Frame(content, bg=APP_BG_COLOR)
-        button_panel.pack(side="left", fill="y", padx=(0, 18))
-
-        display_panel = tk.Frame(content, bg=APP_BG_COLOR, bd=1, relief="sunken")
-        display_panel.pack(side="left", fill="both", expand=True)
 
         self.toggle_button = self._create_image_button(
-            parent=button_panel,
+            parent=self.main_canvas,
             text="Enable Mod",
             command=self.toggle_mod,
         )
-        self.toggle_button.pack(pady=8, anchor="w")
+        self.main_canvas.create_window(36, 170, window=self.toggle_button, anchor="nw")
 
         self.launch_button = self._create_image_button(
-            parent=button_panel,
+            parent=self.main_canvas,
             text="Launch Game",
             command=self.launch_game,
         )
-        self.launch_button.pack(pady=8, anchor="w")
+        self.main_canvas.create_window(36, 240, window=self.launch_button, anchor="nw")
 
         self.settings_button = self._create_image_button(
-            parent=button_panel,
+            parent=self.main_canvas,
             text="Settings",
             command=self.open_settings,
         )
-        self.settings_button.pack(pady=8, anchor="w")
+        self.main_canvas.create_window(36, 310, window=self.settings_button, anchor="nw")
+
+        display_panel = tk.Frame(self.main_canvas, bg="#140d09", bd=1, relief="sunken")
+        self.main_canvas.create_window(280, 170, window=display_panel, anchor="nw", width=660, height=300)
 
         display_title = tk.Label(
             display_panel,
             text="News / Updates (Sample)",
-            bg=APP_BG_COLOR,
+            bg="#140d09",
             fg=BUTTON_TEXT_COLOR,
             font=("Segoe UI", 12, "bold"),
             pady=8,
@@ -143,13 +146,18 @@ class ModLauncherApp:
         )
         self.display_box.configure(state="disabled")
 
-        self.status_var = tk.StringVar(value="Ready")
-        status = tk.Label(root, textvariable=self.status_var, fg="#c28d52", bg=APP_BG_COLOR)
-        status.pack(anchor="w", padx=18, pady=(0, 14))
+        self.status_text_item = self.main_canvas.create_text(
+            36,
+            height - 26,
+            anchor="w",
+            text="Ready",
+            fill="#c28d52",
+            font=("Segoe UI", 10, "bold"),
+        )
         self.refresh_toggle_button()
 
     def set_status(self, text: str) -> None:
-        self.status_var.set(text)
+        self.main_canvas.itemconfigure(self.status_text_item, text=text)
 
     def _get_game_directory(self) -> Path | None:
         if not self.settings.game_directory:
