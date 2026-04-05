@@ -1,0 +1,8 @@
+# Local launcher config
+launcher_settings.json
+
+# Optional local UI art files (keep local, do not commit)
+updatebtn.png
+updateover.png
+ros_logo.png
+ros_bg.png

@@ -1,2 +1,57 @@
 # ROSLauncher
-New Launcher for Return of Shadow
+
+Simple desktop launcher for toggling a game mod and launching the game executable.
+
+## Features
+
+- Toggle mod with one button (Enable/Disable)
+- Launch `lotrbfme.exe` from the selected game folder
+- Settings dialog to configure game folder
+- Matching custom art for **Enable/Disable**, **Launch Game**, and **Settings** buttons
+- Optional header logo image (`ros_logo.png`)
+- Right-side sample scroll display panel reserved for future hosted content
+- Optional background image (`ros_bg.png`)
+
+## Requirements
+
+- Python 3.9+ (includes `tkinter` on most Windows installs)
+
+## Run
+
+```bash
+python launcher.py
+```
+
+If `updatebtn.png` and `updateover.png` are placed next to `launcher.py`, the launcher uses them for the **Enable/Disable**, **Launch Game**, and **Settings** buttons with overlaid text color `#b86517`.
+
+If `ros_logo.png` is placed next to `launcher.py`, it is shown as the launcher header. The launcher background color is `#251611`.
+
+If `ros_bg.png` is placed next to `launcher.py`, it is used as the launcher background image.
+
+> Note: these optional image files are intentionally gitignored so you can keep art assets local without blocking PR updates.
+
+## First-time setup
+
+1. Open **Settings**.
+2. Set **Game Folder** to the folder that contains the mod files and `lotrbfme.exe`.
+3. Click **Save**.
+
+Settings are stored in `launcher_settings.json` in the same directory.
+
+## Mod toggle behavior
+
+When enabling the mod:
+
+- `asset.dat` → `asset.safe` (if it exists)
+- `asset.ros` → `asset.dat` (if it exists)
+- Rename each file from `.ros` to `.big` (if present):
+  - `_rosfile001`
+  - `_rosfile002`
+  - `_rosfile003`
+  - `_rosfile004`
+  - `_rosfile005`
+  - `_rospatch01`
+  - `_rospatch02`
+  - `_rospatch03`
+
+When disabling the mod, the launcher applies the reverse rename operations (`.big` back to `.ros`, and asset names back to their original values).
